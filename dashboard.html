@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard - Lost and Found</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <style>
+    .dashboard-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .welcome-message {
+      text-align: center;
+      margin: 2rem 0;
+      color: #2e1d50;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 1.5rem;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .welcome-message h2 {
+      margin: 0;
+      font-size: 1.8rem;
+    }
+
+    .items-section {
+      margin-bottom: 4rem;
+    }
+
+    .section-title {
+      color: #2e1d50;
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      text-align: center;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      backdrop-filter: blur(10px);
+    }
+
+    .items-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      width: 100%;
+    }
+
+    .item-card {
+      background: rgba(255, 255, 255, 0.98);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .item-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .item-image-container {
+      width: 100%;
+      height: 250px;
+      background: #f8f9fa;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .item-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      transition: transform 0.3s ease;
+      max-height: 100%;
+    }
+
+    .item-card:hover .item-image {
+      transform: scale(1.02);
+    }
+
+    .item-details {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .item-details h3 {
+      color: #2e1d50;
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+      border-bottom: 2px solid #f0f0f0;
+      padding-bottom: 0.5rem;
+    }
+
+    .item-info-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .item-info-grid p {
+      margin: 0;
+      line-height: 1.4;
+      font-size: 1rem;
+    }
+
+    .item-details strong {
+      color: #2e1d50;
+      font-weight: 600;
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+
+    .description-section {
+      margin-top: auto;
+      padding-top: 1rem;
+      border-top: 1px solid #f0f0f0;
+    }
+
+    .description-section p {
+      color: #4a5568;
+      line-height: 1.6;
+      font-size: 1.1rem;
+      margin: 0;
+    }
+
+    .item-status {
+      display: inline-block;
+      padding: 0.6rem 1.8rem;
+      border-radius: 25px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 0.5rem;
+    }
+
+    .lost {
+      background-color: #ff4d4d;
+      color: white;
+      box-shadow: 0 4px 15px rgba(255, 77, 77, 0.2);
+    }
+
+    .found {
+      background-color: #4CAF50;
+      color: white;
+      box-shadow: 0 4px 15px rgba(76, 175, 80, 0.2);
+    }
+
+    .item-meta {
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid #f0f0f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #666;
+      font-size: 0.95rem;
+    }
+
+    .posted-by {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .posted-by::before {
+      content: '👤';
+    }
+
+    .posted-date::before {
+      content: '📅';
+      margin-right: 0.5rem;
+    }
+
+    .no-items {
+      text-align: center;
+      color: #666;
+      padding: 3rem;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 15px;
+      font-size: 1.2rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    @media (max-width: 1200px) {
+      .items-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .items-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .item-image-container {
+        height: 300px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .dashboard-container {
+        padding: 1rem;
+      }
+
+      .section-title {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .item-details h3 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <h1>Lost and Found</h1>
+    <nav>
+      <a href="{{ url_for('dashboard') }}" class="nav-button active">Dashboard</a>
+      <a href="{{ url_for('post_items') }}" class="nav-button">Post Items</a>
+      <a href="{{ url_for('my_items') }}" class="nav-button">My Items</a>
+      <a href="{{ url_for('matched_items') }}" class="nav-button">Matched Items</a>
+      <a href="{{ url_for('logout') }}" class="nav-button logout">Logout</a>
+    </nav>
+  </header>
+
+  <!-- Welcome Message -->
+  <div class="welcome-message">
+    <h2>Welcome, {{ current_user.username }}! 👋</h2>
+  </div>
+
+  <!-- Main Dashboard Container -->
+  <div class="dashboard-container">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-success">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Lost Items Section -->
+    <section class="items-section">
+      <h2 class="section-title">Lost Items</h2>
+      <div class="items-grid">
+        {% if lost_items %}
+          {% for item in lost_items %}
+            <div class="item-card">
+              <div class="item-image-container">
+                {% if item.image_url %}
+                  <img src="{{ url_for('static', filename=item.image_url) }}" alt="{{ item.title }}" class="item-image">
+                {% else %}
+                  <img src="{{ url_for('static', filename='images/placeholder.png') }}" alt="No image available" class="item-image">
+                {% endif %}
+              </div>
+              <div class="item-details">
+                <h3>{{ item.title }}</h3>
+                <div class="item-info-grid">
+                  <p><strong>Location</strong> {{ item.location }}</p>
+                  <p><strong>Category</strong> {{ item.item_type }}</p>
+                  <p><strong>Date Lost</strong> {{ item.date_lost_found.strftime('%B %d, %Y') }}</p>
+                  <p><strong>Status</strong> <span class="item-status lost">Lost</span></p>
+                </div>
+                <div class="description-section">
+                  <p><strong>Description</strong> {{ item.description }}</p>
+                </div>
+                <div class="item-meta">
+                  <span class="posted-by">{{ item.owner.username }}</span>
+                  <span class="posted-date">{{ item.created_at.strftime('%B %d, %Y') }}</span>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="no-items">No lost items reported yet.</div>
+        {% endif %}
+      </div>
+    </section>
+
+    <!-- Found Items Section -->
+    <section class="items-section">
+      <h2 class="section-title">Found Items</h2>
+      <div class="items-grid">
+        {% if found_items %}
+          {% for item in found_items %}
+            <div class="item-card">
+              <div class="item-image-container">
+                {% if item.image_url %}
+                  <img src="{{ url_for('static', filename=item.image_url) }}" alt="{{ item.title }}" class="item-image">
+                {% else %}
+                  <img src="{{ url_for('static', filename='images/placeholder.png') }}" alt="No image available" class="item-image">
+                {% endif %}
+              </div>
+              <div class="item-details">
+                <h3>{{ item.title }}</h3>
+                <div class="item-info-grid">
+                  <p><strong>Location</strong> {{ item.location }}</p>
+                  <p><strong>Category</strong> {{ item.item_type }}</p>
+                  <p><strong>Date Found</strong> {{ item.date_lost_found.strftime('%B %d, %Y') }}</p>
+                  <p><strong>Status</strong> <span class="item-status found">Found</span></p>
+                </div>
+                <div class="description-section">
+                  <p><strong>Description</strong> {{ item.description }}</p>
+                </div>
+                <div class="item-meta">
+                  <span class="posted-by">{{ item.owner.username }}</span>
+                  <span class="posted-date">{{ item.created_at.strftime('%B %d, %Y') }}</span>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="no-items">No found items reported yet.</div>
+        {% endif %}
+      </div>
+    </section>
+  </div>
+</body>
+</html>

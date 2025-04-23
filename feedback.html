@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Feedback</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Feedback</h1>
+    <nav>
+      <a href="dashboard.html">Dashboard</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="form-container">
+      <h2>Leave Feedback</h2>
+      <form action="/cgi-bin/feedback.cgi" method="POST">
+        <input type="hidden" name="item_id" value="123"> <!-- dynamic ID -->
+        <textarea name="message" placeholder="Your feedback..." required></textarea>
+        <input type="submit" value="Submit Feedback">
+      </form>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Post Items - Lost and Found</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  <style>
+    .image-preview-container {
+      margin-top: 10px;
+      display: none;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 14px;
+      padding: 10px;
+      text-align: center;
+    }
+    
+    .image-preview {
+      max-width: 100%;
+      max-height: 200px;
+      border-radius: 8px;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .remove-image {
+      background: #ff4d4d;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      margin-top: 10px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+
+    .remove-image:hover {
+      background: #ff3333;
+      transform: scale(1.05);
+    }
+
+    .flash-messages {
+      width: 100%;
+      max-width: 600px;
+      margin: 1rem auto;
+      padding: 0 1rem;
+    }
+
+    .flash-message {
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      color: white;
+      font-weight: 500;
+    }
+
+    .flash-message.success {
+      background-color: #4CAF50;
+    }
+
+    .flash-message.error {
+      background-color: #ff4d4d;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <h1>Lost and Found</h1>
+    <nav>
+      <a href="{{ url_for('dashboard') }}" class="nav-button">Dashboard</a>
+      <a href="{{ url_for('post_items') }}" class="nav-button active">Post Items</a>
+      <a href="{{ url_for('my_items') }}" class="nav-button">My Items</a>
+      <a href="{{ url_for('matched_items') }}" class="nav-button">Matched Items</a>
+      <a href="{{ url_for('logout') }}" class="nav-button logout">Logout</a>
+    </nav>
+  </header>
+
+  <!-- Flash Messages -->
+  <div class="flash-messages">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-message {{ category }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <!-- Main Form Section -->
+  <main>
+    <div class="form-container post-items-container">
+      <h2>Post an Item</h2>
+      <form id="postItemForm" class="post-items-form" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="status">Item Status*</label>
+          <select id="status" name="status" required>
+            <option value="">Select Status</option>
+            <option value="lost">Lost Item</option>
+            <option value="found">Found Item</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="title">Item Name*</label>
+          <input type="text" id="title" name="title" required placeholder="Enter item name" />
+        </div>
+        
+        <div class="form-group">
+          <label for="location">Location*</label>
+          <input type="text" id="location" name="location" required placeholder="Where was it found/lost?" />
+        </div>
+        
+        <div class="form-group">
+          <label for="date">Date*</label>
+          <input type="date" id="date" name="date" required />
+        </div>
+        
+        <div class="form-group file-upload">
+          <label for="image">Upload Image</label>
+          <input type="file" id="image" name="image" accept="image/*" onchange="previewImage(this)" />
+          <div id="imagePreviewContainer" class="image-preview-container">
+            <img id="imagePreview" class="image-preview" src="#" alt="Image preview" />
+            <button type="button" class="remove-image" onclick="removeImage()">Remove Image</button>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="item_type">Category*</label>
+          <select id="item_type" name="item_type" required>
+            <option value="">Select Category</option>
+            <option value="electronics">Electronics</option>
+            <option value="clothing">Clothing</option>
+            <option value="accessories">Accessories</option>
+            <option value="documents">Documents</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="description">Description*</label>
+          <textarea id="description" name="description" rows="4" required placeholder="Provide details about the item..."></textarea>
+        </div>
+        
+        <button type="submit" class="submit-btn">Post Item</button>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    const username = localStorage.getItem("username") || "User";
+    document.getElementById("username").textContent = username;
+
+    function previewImage(input) {
+      const preview = document.getElementById('imagePreview');
+      const previewContainer = document.getElementById('imagePreviewContainer');
+      
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+          preview.src = e.target.result;
+          previewContainer.style.display = 'block';
+        }
+        
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    function removeImage() {
+      const input = document.getElementById('image');
+      const preview = document.getElementById('imagePreview');
+      const previewContainer = document.getElementById('imagePreviewContainer');
+      
+      input.value = ''; // Clear the file input
+      preview.src = '#';
+      previewContainer.style.display = 'none';
+    }
+
+    // Auto-hide flash messages after 5 seconds
+    setTimeout(function() {
+      const flashMessages = document.querySelectorAll('.flash-message');
+      flashMessages.forEach(function(message) {
+        message.style.display = 'none';
+      });
+    }, 5000);
+  </script>
+  
+</body>
+</html>

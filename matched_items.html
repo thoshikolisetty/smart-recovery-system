@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matched Items - Lost and Found</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .section-title {
+            color: #2e1d50;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            backdrop-filter: blur(10px);
+        }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            width: 100%;
+        }
+
+        .match-card {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .match-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .match-items {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            padding: 1.5rem;
+        }
+
+        .item-pair {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(46, 29, 80, 0.05);
+            border-radius: 12px;
+        }
+
+        .item-image-container {
+            width: 120px;
+            height: 120px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .item-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .item-details h4 {
+            color: #2e1d50;
+            margin: 0 0 0.5rem 0;
+            font-size: 1.1rem;
+        }
+
+        .item-info {
+            font-size: 0.9rem;
+            color: #666;
+            margin: 0.2rem 0;
+        }
+
+        .match-status {
+            text-align: center;
+            padding: 1rem;
+            background: #4CAF50;
+            color: white;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .match-date {
+            text-align: center;
+            padding: 0.5rem;
+            background: rgba(46, 29, 80, 0.05);
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .no-matches {
+            text-align: center;
+            color: #666;
+            padding: 3rem;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        @media (max-width: 1200px) {
+            .items-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .items-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .item-pair {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .item-image-container {
+                width: 100%;
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Lost and Found</h1>
+        <nav>
+            <a href="{{ url_for('dashboard') }}" class="nav-button">Dashboard</a>
+            <a href="{{ url_for('post_items') }}" class="nav-button">Post Items</a>
+            <a href="{{ url_for('my_items') }}" class="nav-button">My Items</a>
+            <a href="{{ url_for('matched_items') }}" class="nav-button active">Matched Items</a>
+            <a href="{{ url_for('logout') }}" class="nav-button logout">Logout</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="dashboard-container">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-success">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <h2 class="section-title">Matched Items</h2>
+
+            <div class="items-grid">
+                {% if matched_pairs %}
+                    {% for pair in matched_pairs %}
+                        <div class="match-card">
+                            <div class="match-status">MATCHED!</div>
+                            <div class="match-items">
+                                <!-- Lost Item -->
+                                <div class="item-pair">
+                                    <div class="item-image-container">
+                                        {% if pair.lost_item.image_url %}
+                                            <img src="{{ url_for('static', filename=pair.lost_item.image_url) }}" alt="{{ pair.lost_item.title }}" class="item-image">
+                                        {% else %}
+                                            <img src="{{ url_for('static', filename='images/placeholder.png') }}" alt="No image" class="item-image">
+                                        {% endif %}
+                                    </div>
+                                    <div class="item-details">
+                                        <h4>{{ pair.lost_item.title }}</h4>
+                                        <p class="item-info"><strong>Status:</strong> Lost</p>
+                                        <p class="item-info"><strong>Location:</strong> {{ pair.lost_item.location }}</p>
+                                        <p class="item-info"><strong>Posted by:</strong> {{ pair.lost_item.owner.username }}</p>
+                                        <p class="item-info"><strong>Contact:</strong> {{ pair.lost_item.owner.phone }}</p>
+                                    </div>
+                                </div>
+                                <!-- Found Item -->
+                                <div class="item-pair">
+                                    <div class="item-image-container">
+                                        {% if pair.found_item.image_url %}
+                                            <img src="{{ url_for('static', filename=pair.found_item.image_url) }}" alt="{{ pair.found_item.title }}" class="item-image">
+                                        {% else %}
+                                            <img src="{{ url_for('static', filename='images/placeholder.png') }}" alt="No image" class="item-image">
+                                        {% endif %}
+                                    </div>
+                                    <div class="item-details">
+                                        <h4>{{ pair.found_item.title }}</h4>
+                                        <p class="item-info"><strong>Status:</strong> Found</p>
+                                        <p class="item-info"><strong>Location:</strong> {{ pair.found_item.location }}</p>
+                                        <p class="item-info"><strong>Posted by:</strong> {{ pair.found_item.owner.username }}</p>
+                                        <p class="item-info"><strong>Contact:</strong> {{ pair.found_item.owner.phone }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="match-date">Matched on {{ pair.match_date.strftime('%B %d, %Y') }}</div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-matches">No matched items found yet.</div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function contactUser(userId) {
+            // Implement contact functionality
+            alert('Contact feature coming soon!');
+        }
+    </script>
+</body>
+</html> 
