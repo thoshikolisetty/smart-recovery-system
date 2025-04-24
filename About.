@@ -1,1 +1,11 @@
+SO, Here is my project - SMART RECOVERY SYSTEM its basically works on LOST AND FOUND items !!!
+Brief intro---
+1. We will sign into the page , If already have an account log in .
+2.It will directly takes you into the dashboard page , where you can post your lost or found items with theor time,location ,description , 
+image etc....
+3.After posting the item , The items will be displayes to everyone on the dashboard page, whereas the items will be in my listings page for the
+particular user who posted the items.
+we used xampp to connect my database,frontend and backend , where i can see the details of users who logged in and the items whethers it is
+lost or found and if the lost item is matched with the found item the user will get a in-app notification .The user can check their items in 
+matched items page there we will provide the details of the user !!
 
